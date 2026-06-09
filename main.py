@@ -1,3 +1,5 @@
+from db import connection, cursor
+
 students = []
 hosts = []
 workshops = []
@@ -9,13 +11,12 @@ def register_student():
     email = input("Enter student email: ")
     password = input("Enter password: ")
 
-    student = {
-        "name": name,
-        "email": email,
-        "password": password
-    }
+    cursor.execute(
+        "INSERT INTO students(name,email,password) VALUES(%s,%s,%s)",
+        (name, email, password)
+    )
 
-    students.append(student)
+    connection.commit()
 
     print("Student registered successfully!")
 
@@ -59,11 +60,18 @@ while True:
         register_host()
 
     elif choice == 3:
+
+        cursor.execute("SELECT * FROM students")
+
+        students = cursor.fetchall()
+
         print("\nRegistered Students:")
+
         for student in students:
-            print("Name:", student["name"])
-            print("Email:", student["email"])
-            print("password:", student["password"])
+            print("ID:", student[0])
+            print("Name:", student[1])
+            print("Email:", student[2])
+            print("Password:", student[3])
             print()
 
     elif choice == 4:
