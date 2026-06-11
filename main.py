@@ -1,5 +1,6 @@
 from db import connection, cursor
 
+
 students = []
 hosts = []
 workshops = []
@@ -21,18 +22,20 @@ def register_student():
     print("Student registered successfully!")
 
 def register_host():
+
     name = input("Enter host name: ")
     email = input("Enter host email: ")
     password = input("Enter password: ")
-    verified = False
 
-    host = {
-        "name": name,
-        "email": email,
-        "password": password,
-        "verified": verified
-    }
-    hosts.append(host)
+    cursor.execute(
+        """
+        INSERT INTO hosts(name,email,password,verified)
+        VALUES(%s,%s,%s,%s)
+        """,
+        (name, email, password, False)
+    )
+
+    connection.commit()
 
     print("Host registered successfully!")
 
@@ -75,13 +78,18 @@ while True:
             print()
 
     elif choice == 4:
-        print("\nRegistered Hosts:")
+        cursor.execute("SELECT * FROM hosts")
+
+        hosts = cursor.fetchall()
+
         for host in hosts:
-            print("Name:", host["name"])
-            print("Email:", host["email"])
-            print("password:", host["password"])
-            print("Verified:", host["verified"])
-            print()
+
+         print("ID:", host[0])
+         print("Name:", host[1])
+         print("Email:", host[2])
+         print("Password:", host[3])
+         print("Verified:", host[4])
+         print()
 
     elif choice == 5:
         title = input("Enter workshop title: ")
@@ -179,17 +187,18 @@ while True:
     elif choice == 9:
         host_name = input("Enter host name to verify: ")
 
-        found = False
-        for host in hosts:
-            if host["name"] == host_name:
-    
-                host["verified"] = True
-                found = True
-                print("Host verified successfully!")
-                break
+        cursor.execute(
+         """
+         UPDATE hosts
+         SET verified = TRUE
+         WHERE name = %s
+         """,
+         (host_name,)
+        )
 
-        if not found:
-                print("Host not found!")
+        connection.commit()
+
+        print("Host verified successfully!")
 
     elif choice == 10:
         print("Thank you for using SkillBridge!")
