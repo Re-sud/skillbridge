@@ -92,45 +92,67 @@ while True:
          print()
 
     elif choice == 5:
-        title = input("Enter workshop title: ")
-        host_name = input("Enter host name: ")
-        fee = float(input("Enter workshop fee: "))
-        category = input("Enter workshop category: ")
-        capacity = int(input("Enter the number of seats available: "))
-        workshop = {
-            "title": title,
-            "host": host_name,
-            "fee": fee,
-            "category": category,
-            "capacity": capacity,
-            "available_seats": capacity,
-        }
+     title = input("Enter workshop title: ")
+     host_name = input("Enter host name: ")
+     fee = float(input("Enter workshop fee: "))
+     category = input("Enter workshop category: ")
+     capacity = int(input("Enter the number of seats available: "))
 
-        host_found = False
+     cursor.execute(
+        """
+        SELECT * FROM hosts
+        WHERE name = %s
+        AND verified = TRUE
+        """,
+        (host_name,)
+     )
 
-        for host in hosts:
-            if host["name"] == host_name and host["verified"]:
-              host_found = True
-              break
+     host = cursor.fetchone()
 
-        if host_found:
-            workshops.append(workshop)
-            print("Workshop created successfully!")
+     if host:
 
-        else:
-            print("only verified hosts can create workshops!")
+        cursor.execute(
+            """
+            INSERT INTO workshops
+            (title, host_name, fee, category, capacity, available_seats)
+            VALUES(%s,%s,%s,%s,%s,%s)
+            """,
+            (
+                title,
+                host_name,
+                fee,
+                category,
+                capacity,
+                capacity
+            )
+        )
 
+        connection.commit()
+
+        print("Workshop created successfully!")
+
+     else:
+        print("Host not found or not verified!")
+
+        
     elif choice == 6:
-        print("\nAvailable Workshops:")
 
-        for workshop in workshops:
-            print("Title:", workshop["title"])
-            print("Host:", workshop["host"])
-            print("Fee:", workshop["fee"])
-            print("Category:", workshop["category"])
-            print("Capacity:", workshop["capacity"])
-            print("available seats in the workshop:", workshop["available_seats"])    
-            print()
+     cursor.execute("SELECT * FROM workshops")
+
+     workshops = cursor.fetchall()
+
+     print("\nAvailable Workshops:")
+
+     for workshop in workshops:
+
+        print("ID:", workshop[0])
+        print("Title:", workshop[1])
+        print("Host:", workshop[2])
+        print("Fee:", workshop[3])
+        print("Category:", workshop[4])
+        print("Capacity:", workshop[5])
+        print("Available Seats:", workshop[6])
+        print()
 
     elif choice == 7:
         student_name = input("Enter student name: ")
