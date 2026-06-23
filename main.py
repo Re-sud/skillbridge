@@ -52,7 +52,8 @@ while True:
     print("8. View Bookings")
     print("9. Cancel Booking")
     print("10. Verify Host")
-    print("11. Exit")
+    print("11. Search Workshop")
+    print("12. Exit")
 
     choice = int(input("Enter your choice: "))
 
@@ -312,6 +313,33 @@ while True:
         print("Host verified successfully!")
 
     elif choice == 11:
+
+     keyword = input("Enter workshop keyword: ")
+
+     cursor.execute(
+        """
+        SELECT * FROM workshops
+        WHERE title LIKE %s
+        """,
+        ("%" + keyword + "%",)
+    )
+
+     workshops = cursor.fetchall()
+
+     if len(workshops) == 0:
+        print("No workshops found!")
+     else:
+        print("\nMatching Workshops:")
+
+        for workshop in workshops:
+            print("Title:", workshop[1])
+            print("Host:", workshop[2])
+            print("Fee:", workshop[3])
+            print("Category:", workshop[4])
+            print("Available Seats:", workshop[6])
+            print()
+
+    elif choice == 12:
 
         print("Thank you for using SkillBridge!")
         break
