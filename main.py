@@ -155,56 +155,89 @@ while True:
         print()
 
     elif choice == 7:
-        student_name = input("Enter student name: ")
-        workshop_title = input("Enter workshop title: ")
 
-        student_found = False
-        for student in students:
-            if student["name"] == student_name:
-                student_found = True
-                break
+     student_name = input("Enter student name: ")
+     workshop_title = input("Enter workshop title: ")
 
-        workshop_found = False
-        selected_workshop = None
-        for workshop in workshops:
-            if workshop["title"] == workshop_title:
-                workshop_found = True
-                selected_workshop = workshop
-                break
-        
+    # Check student exists
 
+     cursor.execute(
+        """
+         SELECT * FROM students
+        WHERE name = %s
+        """,
+        (student_name,)
+     )
 
-        if student_found and workshop_found:
+     student = cursor.fetchone()
 
+     if not student:
+        print("Student not found!")
+        continue
 
-            if student_found and workshop_found:
+    # Check workshop exists
 
-              if selected_workshop["available_seats"] == 0:
-                print("Sorry, no seats available for this workshop!")
-                continue
+     cursor.execute(
+        """
+        SELECT * FROM workshops
+        WHERE title = %s
+        """,
+        (workshop_title,)
+    )
 
-            selected_workshop["available_seats"] -= 1
+     workshop = cursor.fetchone()
 
-            booking = {
-                "student_name": student_name,
-                "workshop_title": workshop_title
-                    }
+     if not workshop:
+        print("Workshop not found!")
+        continue
 
-            bookings.append(booking)
+    # Check seats available
 
-            print("Workshop booked successfully!")
+     available_seats = workshop[6]
 
-        else:
-             print("Student or Workshop not found!")
+     if available_seats <= 0:
+        print("Sorry, no seats available!")
+        continue
 
+    # Create booking
 
+     cursor.execute(
+        """
+        INSERT INTO bookings(student_name, workshop_title)
+        VALUES(%s,%s)
+        """,
+        (student_name, workshop_title)
+    )
+
+    # Reduce available seats
+
+     cursor.execute(
+        """
+        UPDATE workshops
+        SET available_seats = available_seats - 1
+        WHERE title = %s
+        """,
+        (workshop_title,)
+    )
+
+     connection.commit()
+
+     print("Workshop booked successfully!")
 
     elif choice == 8:
-        print("\nBooked Workshops:")
-        for booking in bookings:
-            print("Student:", booking["student_name"])
-            print("Workshop:", booking["workshop_title"])
-            print()
+
+     cursor.execute("SELECT * FROM bookings")
+
+     bookings = cursor.fetchall()
+
+     print("\nBooked Workshops:")
+
+     for booking in bookings:
+
+        print("ID:", booking[0])
+        print("Student:", booking[1])
+        print("Workshop:", booking[2])
+        print()
 
     elif choice == 9:
         host_name = input("Enter host name to verify: ")
