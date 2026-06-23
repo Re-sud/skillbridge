@@ -11,6 +11,8 @@ connection = mysql.connector.connect(
     database=os.getenv("DB_NAME")
 )
 
-cursor = connection.cursor()
+# Use a buffered cursor so previous SELECT results are consumed
+# and `mysql.connector.errors.InternalError: Unread result found` is avoided.
+cursor = connection.cursor(buffered=True)
 
 print("Database Connected!")
