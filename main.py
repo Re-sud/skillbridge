@@ -50,8 +50,9 @@ while True:
     print("6. View Workshops")
     print("7. Book Workshop")
     print("8. View Bookings")
-    print("9. Verify Host")
-    print("10. Exit")
+    print("9. Cancel Booking")
+    print("10. Verify Host")
+    print("11. Exit")
 
     choice = int(input("Enter your choice: "))
 
@@ -247,6 +248,54 @@ while True:
 
     elif choice == 9:
 
+     student_name = input("Enter student name: ")
+     workshop_title = input("Enter workshop title: ")
+
+    # Check booking exists
+
+     cursor.execute(
+        """
+        SELECT * FROM bookings
+        WHERE student_name = %s
+        AND workshop_title = %s
+        """,
+        (student_name, workshop_title)
+    )
+
+     booking = cursor.fetchone()
+
+     if not booking:
+         print("Booking not found!")
+         continue
+
+    # Delete booking
+
+     cursor.execute(
+        """
+        DELETE FROM bookings
+        WHERE student_name = %s
+        AND workshop_title = %s
+        """,
+        (student_name, workshop_title)
+    )
+
+    # Return seat
+
+     cursor.execute(
+        """
+        UPDATE workshops
+        SET available_seats = available_seats + 1
+        WHERE title = %s
+        """,
+        (workshop_title,)
+    )
+
+     connection.commit()
+
+     print("Booking cancelled successfully!")
+
+    elif choice == 10:
+
         host_name = input("Enter host name to verify: ")
 
         cursor.execute(
@@ -262,7 +311,7 @@ while True:
 
         print("Host verified successfully!")
 
-    elif choice == 10:
+    elif choice == 11:
 
         print("Thank you for using SkillBridge!")
         break
