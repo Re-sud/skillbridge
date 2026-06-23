@@ -53,7 +53,8 @@ while True:
     print("9. Cancel Booking")
     print("10. Verify Host")
     print("11. Search Workshop")
-    print("12. Exit")
+    print("12. dashboard")
+    print("13. Exit")
 
     choice = int(input("Enter your choice: "))
 
@@ -341,8 +342,71 @@ while True:
 
     elif choice == 12:
 
+     print("\n===== SkillBridge Dashboard =====")
+
+    # Total Students
+
+     cursor.execute(
+        """
+        SELECT COUNT(*) FROM students
+        """
+    )
+
+     total_students = cursor.fetchone()[0]
+
+    # Total Hosts
+
+     cursor.execute(
+        """
+        SELECT COUNT(*) FROM hosts
+        """
+    )
+
+     total_hosts = cursor.fetchone()[0]
+
+    # Verified Hosts
+
+     cursor.execute(
+        """
+        SELECT COUNT(*) FROM hosts
+        WHERE verified = TRUE
+        """
+    )
+
+     verified_hosts = cursor.fetchone()[0]
+
+    # Total Workshops
+
+     cursor.execute(
+        """
+        SELECT COUNT(*) FROM workshops
+        """
+    )
+
+     total_workshops = cursor.fetchone()[0]
+
+    # Total Bookings
+
+     cursor.execute(
+        """
+        SELECT COUNT(*) FROM bookings
+        """
+    )
+
+     total_bookings = cursor.fetchone()[0]
+
+     print("Total Students:", total_students)
+     print("Total Hosts:", total_hosts)
+     print("Verified Hosts:", verified_hosts)
+     print("Total Workshops:", total_workshops)
+     print("Total Bookings:", total_bookings)
+
+    elif choice == 13:
+
         print("Thank you for using SkillBridge!")
         break
 
     else:
         print("Invalid choice!")
+
+
